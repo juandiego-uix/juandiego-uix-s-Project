@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="theme-color" content="#102a24">
+  <title>Panel financiero | ARANKO FOOD</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="icon" href="{{ url_for('static', filename='icons/aranko.svg') }}" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="min-h-screen bg-[#f3f5f2] text-slate-900">
+  <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+      <a href="/" class="flex items-center gap-3">
+        <img class="h-10 w-10 rounded-xl" src="{{ url_for('static', filename='icons/aranko.svg') }}" alt="">
+        <span><strong class="block text-sm tracking-wide">ARANKO FOOD</strong><span class="text-xs text-slate-500">Panel financiero</span></span>
+      </a>
+      <div class="flex items-center gap-3">
+        <button id="install-app" class="hidden rounded-lg border border-emerald-700 px-3 py-2 text-sm font-medium text-emerald-800">Instalar app</button>
+        <button id="logout" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+    <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div><p class="text-sm font-semibold text-emerald-800">RESUMEN DEL NEGOCIO</p><h1 class="mt-1 text-2xl font-semibold">Panel de control</h1><p class="mt-1 text-sm text-slate-500">Caja, ventas y obligaciones de ARANKO FOOD.</p></div>
+      <label class="text-sm font-medium text-slate-600">Fecha de consulta
+        <input id="report-date" type="date" class="ml-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900">
+      </label>
+    </div>
+    <div id="notice" role="status" class="mb-5 hidden rounded-xl px-4 py-3 text-sm"></div>
+    <section id="metrics" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Saldo inicial del día</p><p id="opening-cash" class="mt-2 text-2xl font-semibold">—</p></article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Saldo final de caja</p><p id="closing-cash" class="mt-2 text-2xl font-semibold">—</p></article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Ingresos facturados</p><p id="revenue" class="mt-2 text-2xl font-semibold">—</p></article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Utilidad del día</p><p id="daily-profit" class="mt-2 text-2xl font-semibold text-emerald-800">—</p></article>
+      <article class="rounded-2xl bg-[#102a24] p-5 text-white shadow-sm"><p class="text-sm text-emerald-100/70">Capital neto estimado</p><p id="net-worth" class="mt-2 text-2xl font-semibold">—</p></article>
+    </section>
+    <section class="mt-3 grid gap-3 sm:grid-cols-2">
+      <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Costo de productos vendidos</p><p id="cost-of-goods" class="mt-2 text-xl font-semibold">—</p></article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Gastos varios del día</p><p id="expenses-total" class="mt-2 text-xl font-semibold">—</p></article>
+    </section>
+
+    <section class="mt-7 flex flex-wrap gap-2">
+      <button data-open="invoice-modal" class="rounded-xl bg-[#176b50] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#12553f]">+ Nueva factura</button>
+      <button data-open="income-modal" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-50">Registrar ingreso</button>
+      <button data-open="expense-modal" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-50">Registrar gasto</button>
+      <button data-open="client-modal" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-50">Nuevo cliente</button>
+      <button data-open="product-modal" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-50">Nuevo producto</button>
+      <button data-open="capital-modal" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-50">Registrar capital</button>
+      <button data-open="opening-capital-modal" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-50">Configurar capital inicial</button>
+
+      
+      <button data-open="debt-modal" class="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:bg-slate-50">Registrar deuda</button>
+    </section>
+
+    <section class="mt-7 grid gap-5 xl:grid-cols-2">
+      <article class="overflow-hidden rounded-2xl bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 class="font-semibold">Facturas del día</h2><p class="text-xs text-slate-500">Las ventas a crédito cuentan como ingreso al facturar.</p></div><button id="pdf-sales" class="text-sm font-medium text-emerald-800">PDF</button></div>
+        <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-5 py-3">Factura / cliente</th><th class="px-3 py-3">Total</th><th class="px-3 py-3">Pendiente</th><th class="px-5 py-3">Acción</th></tr></thead><tbody id="invoices-table"></tbody></table></div>
+      </article>
+      <article class="overflow-hidden rounded-2xl bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 class="font-semibold">Cartera de clientes</h2><p class="text-xs text-slate-500">Facturas pendientes y abonos por cobrar.</p></div><button id="pdf-receivables" class="text-sm font-medium text-emerald-800">PDF</button></div>
+        <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-5 py-3">Factura / cliente</th><th class="px-3 py-3">Saldo pendiente</th><th class="px-5 py-3">Abono</th></tr></thead><tbody id="receivables-table"></tbody></table></div>
+      </article>
+    </section>
+
+    <section class="mt-5 grid gap-5 xl:grid-cols-2">
+      <article class="overflow-hidden rounded-2xl bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4"><h2 class="font-semibold">Inventario</h2><span class="text-xs text-slate-500">Se descuenta al facturar</span></div>
+        <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-5 py-3">Producto</th><th class="px-3 py-3">Existencia</th><th class="px-3 py-3">Precio</th><th class="px-5 py-3">Costo</th></tr></thead><tbody id="products-table"></tbody></table></div>
+      </article>
+      <article class="overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-amber-200 bg-amber-50 px-5 py-4"><div><h2 class="font-semibold text-amber-950">Deudas activas</h2><p class="text-xs text-amber-800">Obligaciones vigentes de la empresa.</p></div><button id="pdf-debts" class="text-sm font-semibold text-amber-800">PDF</button></div>
+        <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-amber-50/60 text-xs uppercase text-amber-900"><tr><th class="px-5 py-3">Acreedor</th><th class="px-3 py-3">Saldo</th><th class="px-5 py-3">Abonar</th></tr></thead><tbody id="debts-table"></tbody></table></div>
+      </article>
+    </section>
+
+    <section class="mt-5 overflow-hidden rounded-2xl bg-white shadow-sm">
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 class="font-semibold">Movimientos de caja</h2><p class="text-xs text-slate-500">Entradas y salidas registradas para la fecha seleccionada.</p></div><button id="pdf-cash" class="text-sm font-medium text-emerald-800">Corte de caja PDF</button></div>
+      <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-5 py-3">Hora</th><th class="px-3 py-3">Tipo</th><th class="px-3 py-3">Descripción</th><th class="px-5 py-3">Monto</th></tr></thead><tbody id="cash-table"></tbody></table></div>
+    </section>
+  </main>
+
+  <div id="invoice-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4">
+    <form id="invoice-form" class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div class="mb-5 flex items-center justify-between"><h2 class="text-xl font-semibold">Nueva factura</h2><button type="button" data-close class="text-2xl text-slate-400" aria-label="Cerrar">&times;</button></div>
+      <label class="block text-sm font-medium">Cliente
+        <select id="invoice-client" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"><option value="">Venta sin cliente</option></select>
+      </label>
+      <div class="mt-4 grid grid-cols-[1fr_90px_auto] gap-2">
+        <select id="invoice-product" class="rounded-lg border border-slate-200 px-3 py-2 text-sm"></select>
+        <input id="invoice-quantity" type="number" min="1" value="1" class="rounded-lg border border-slate-200 px-3 py-2 text-sm" aria-label="Cantidad">
+        <button id="add-invoice-item" type="button" class="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium">Agregar</button>
+      </div>
+      <div class="mt-3 overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-xs text-slate-500"><tr><th class="py-2">Producto</th><th>Cant.</th><th>Precio</th><th></th></tr></thead><tbody id="invoice-items"></tbody></table></div>
+      <label class="mt-4 block text-sm font-medium">Abono inicial (opcional)
+        <input id="invoice-initial-payment" type="number" min="0" step="0.01" value="0" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+      </label>
+      <label class="mt-4 block text-sm font-medium">Notas
+        <input id="invoice-notes" maxlength="500" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+      </label>
+      <div class="mt-5 flex items-center justify-between"><strong>Total: <span id="invoice-total">0.00</span> {{ currency }}</strong><button class="rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar factura</button></div>
+    </form>
+  </div>
+
+  <div id="income-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4"><form id="income-form" class="w-full max-w-md rounded-2xl bg-white p-6">
+    <div class="mb-5 flex justify-between"><h2 class="text-xl font-semibold">Registrar ingreso operativo</h2><button type="button" data-close class="text-2xl text-slate-400">&times;</button></div>
+    <label class="mb-3 block text-sm font-medium">Descripción<input name="description" required maxlength="200" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Otro ingreso recibido"></label>
+    <label class="mb-5 block text-sm font-medium">Monto<input name="amount" required type="number" min="0.01" step="0.01" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <button class="w-full rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar ingreso</button>
+  </form></div>
+
+  <div id="expense-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4"><form id="expense-form" class="w-full max-w-md rounded-2xl bg-white p-6">
+    <div class="mb-5 flex justify-between"><h2 class="text-xl font-semibold">Registrar gasto</h2><button type="button" data-close class="text-2xl text-slate-400">&times;</button></div>
+    <label class="mb-3 block text-sm font-medium">Descripción<input name="description" required maxlength="200" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <label class="mb-3 block text-sm font-medium">Categoría<input name="category" required maxlength="80" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Transporte, servicios..."></label>
+    <label class="mb-5 block text-sm font-medium">Monto<input name="amount" required type="number" min="0.01" step="0.01" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <button class="w-full rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar gasto</button>
+  </form></div>
+
+  <div id="opening-capital-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4"><form id="opening-capital-form" class="w-full max-w-md rounded-2xl bg-white p-6">
+    <div class="mb-5 flex justify-between"><h2 class="text-xl font-semibold">Capital inicial</h2><button type="button" data-close class="text-2xl text-slate-400">&times;</button></div>
+    <p class="mb-4 text-sm leading-5 text-slate-500">Se configura una sola vez. Después, registra cada aporte adicional como aporte de capital.</p>
+    <label class="mb-5 block text-sm font-medium">Monto inicial<input name="amount" required type="number" min="0" step="0.01" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <button class="w-full rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar capital inicial</button>
+  </form></div>
+
+  <div id="client-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4"><form id="client-form" class="w-full max-w-md rounded-2xl bg-white p-6">
+    <div class="mb-5 flex justify-between"><h2 class="text-xl font-semibold">Nuevo cliente</h2><button type="button" data-close class="text-2xl text-slate-400">&times;</button></div>
+    <label class="mb-3 block text-sm font-medium">Nombre<input name="name" required maxlength="120" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <label class="mb-3 block text-sm font-medium">Teléfono<input name="phone" maxlength="40" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <label class="mb-5 block text-sm font-medium">Correo<input name="email" type="email" maxlength="254" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <button class="w-full rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar cliente</button>
+  </form></div>
+
+  <div id="product-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4"><form id="product-form" class="w-full max-w-md rounded-2xl bg-white p-6">
+    <div class="mb-5 flex justify-between"><h2 class="text-xl font-semibold">Nuevo producto</h2><button type="button" data-close class="text-2xl text-slate-400">&times;</button></div>
+    <label class="mb-3 block text-sm font-medium">Nombre<input name="name" required maxlength="120" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <label class="mb-3 block text-sm font-medium">Código SKU (opcional)<input name="sku" maxlength="60" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <div class="mb-5 grid grid-cols-3 gap-2">
+      <label class="text-sm font-medium">Precio<input name="unit_price" required type="number" min="0.01" step="0.01" class="mt-1 w-full rounded-lg border px-2 py-2"></label>
+      <label class="text-sm font-medium">Costo<input name="unit_cost" required type="number" min="0" step="0.01" class="mt-1 w-full rounded-lg border px-2 py-2"></label>
+      <label class="text-sm font-medium">Existencia<input name="stock" required type="number" min="0" step="1" class="mt-1 w-full rounded-lg border px-2 py-2"></label>
+    </div>
+    <button class="w-full rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar producto</button>
+  </form></div>
+
+  <div id="capital-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4"><form id="capital-form" class="w-full max-w-md rounded-2xl bg-white p-6">
+    <div class="mb-5 flex justify-between"><h2 class="text-xl font-semibold">Aporte de capital</h2><button type="button" data-close class="text-2xl text-slate-400">&times;</button></div>
+    <label class="mb-3 block text-sm font-medium">Descripción<input name="description" required maxlength="200" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Aporte del propietario"></label>
+    <label class="mb-5 block text-sm font-medium">Monto<input name="amount" required type="number" min="0.01" step="0.01" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <button class="w-full rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar aporte</button>
+  </form></div>
+
+  <div id="debt-modal" class="modal fixed inset-0 z-30 hidden items-center justify-center bg-slate-950/50 p-4"><form id="debt-form" class="w-full max-w-md rounded-2xl bg-white p-6">
+    <div class="mb-5 flex justify-between"><h2 class="text-xl font-semibold">Registrar deuda</h2><button type="button" data-close class="text-2xl text-slate-400">&times;</button></div>
+    <label class="mb-3 block text-sm font-medium">Acreedor<input name="creditor" required maxlength="120" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <label class="mb-3 block text-sm font-medium">Descripción<input name="description" required maxlength="200" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <label class="mb-3 block text-sm font-medium">Monto original<input name="amount" required type="number" min="0.01" step="0.01" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <label class="mb-5 block text-sm font-medium">Fecha de vencimiento (opcional)<input name="due_date" type="date" class="mt-1 w-full rounded-lg border px-3 py-2"></label>
+    <button class="w-full rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar deuda</button>
+  </form></div>
+
+  <form id="logout-form" action="{{ url_for('auth.logout') }}" method="post" class="hidden"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"></form>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "id": "/",
+  "name": "ARANKO FOOD - Finanzas",
+  "short_name": "ARANKO",
+  "description": "Administración privada de finanzas, ventas e inventario de ARANKO FOOD.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f5f2",
+  "theme_color": "#102a24",
+  "icons": [
+    { "src": "/static/icons/aranko.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

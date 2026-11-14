@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="csrf-token" content="{{ session.get('csrf_token', '') }}">
+  <meta name="theme-color" content="#102a24">
+  <title>Ingresar | ARANKO FOOD</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="icon" href="{{ url_for('static', filename='icons/aranko.svg') }}" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+</head>
+<body class="min-h-screen bg-[#f3f5f2] text-slate-900">
+  <main class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-5 py-12">
+    <section class="grid w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-xl md:grid-cols-2">
+      <div class="flex flex-col justify-between bg-[#102a24] p-9 text-white md:p-12">
+        <div>
+          <div class="mb-12 flex items-center gap-3">
+            <img class="h-11 w-11 rounded-xl" src="{{ url_for('static', filename='icons/aranko.svg') }}" alt="">
+            <div><p class="font-bold tracking-wide">ARANKO FOOD</p><p class="text-xs text-emerald-100/70">Administración financiera</p></div>
+          </div>
+          <h1 class="text-3xl font-semibold leading-tight">Tus finanzas,<br>en orden.</h1>
+          <p class="mt-4 max-w-xs text-sm leading-6 text-emerald-100/75">Control de caja, facturación, inventario y cartera en un solo lugar.</p>
+        </div>
+        <p class="mt-12 text-xs text-emerald-100/50">Acceso privado para administración autorizada.</p>
+      </div>
+      <div class="p-8 md:p-12">
+        <p class="text-sm font-semibold text-emerald-800">BIENVENIDO</p>
+        <h2 class="mt-2 text-2xl font-semibold">Iniciar sesión</h2>
+        <p class="mt-2 text-sm text-slate-500">Usa la cuenta de administrador de la empresa.</p>
+        {% if error %}
+        <div role="alert" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ error }}</div>
+        {% endif %}
+        <form action="{{ url_for('auth.login') }}" method="post" class="mt-8 space-y-5">
+          <input type="hidden" name="csrf_token" value="{{ session.get('csrf_token', '') }}">
+          <label class="block text-sm font-medium">Correo electrónico
+            <input name="email" type="email" autocomplete="username" required maxlength="254"
+              class="mt-2 block w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15">
+          </label>
+          <label class="block text-sm font-medium">Contraseña
+            <input name="password" type="password" autocomplete="current-password" required
+              class="mt-2 block w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/15">
+          </label>
+          <button class="w-full rounded-xl bg-[#176b50] px-4 py-3 font-semibold text-white transition hover:bg-[#12553f] focus:outline-none focus:ring-4 focus:ring-emerald-800/20">Entrar al sistema</button>
+        </form>
+        <p class="mt-6 text-xs leading-5 text-slate-400">Las cuentas se crean en Supabase. Solo el usuario asignado como administrador puede consultar los datos financieros.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
