@@ -1,10 +1,14 @@
 "use strict";
-const CACHE = "aranko-shell-v2";
+const CACHE = "aranko-shell-v3";
 const SHELL = [
   "/static/icons/aranko.svg",
+  "/static/icons/aranko-180.png",
+  "/static/icons/aranko-192.png",
+  "/static/icons/aranko-512.png",
   "/static/manifest.json",
   "/static/app.css",
   "/static/app.js",
+  "/static/pwa.js",
   "/static/vendor/jspdf.umd.min.js",
   "/static/vendor/jspdf.plugin.autotable.min.js"
 ];

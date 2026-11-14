@@ -259,20 +259,5 @@
       d.creditor, d.description, money(d.balance), d.due_date || "Sin fecha"
     ]), `deudas-${state.data.date}.pdf`));
 
-  let installPrompt;
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    installPrompt = event;
-    $("install-app").classList.remove("hidden");
-  });
-  $("install-app").addEventListener("click", async () => {
-    if (!installPrompt) return;
-    await installPrompt.prompt();
-    installPrompt = null;
-    $("install-app").classList.add("hidden");
-  });
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js").catch(() => showNotice("No se pudo preparar el modo instalable.", true));
-  }
   refresh();
 })();

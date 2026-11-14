@@ -6,10 +6,14 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="csrf-token" content="{{ csrf_token }}">
   <meta name="theme-color" content="#102a24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="ARANKO FOOD">
   <title>Panel financiero | ARANKO FOOD</title>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="icon" href="{{ url_for('static', filename='icons/aranko.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/aranko-180.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script src="{{ url_for('static', filename='pwa.js') }}" defer></script>
   <script src="{{ url_for('static', filename='vendor/jspdf.umd.min.js') }}" defer></script>
   <script src="{{ url_for('static', filename='vendor/jspdf.plugin.autotable.min.js') }}" defer></script>
 </head>
@@ -21,7 +25,7 @@
         <span><strong class="block text-sm tracking-wide">ARANKO FOOD</strong><span class="text-xs text-slate-500">Panel financiero</span></span>
       </a>
       <div class="flex items-center gap-3">
-        <button id="install-app" class="hidden rounded-lg border border-emerald-700 px-3 py-2 text-sm font-medium text-emerald-800">Instalar app</button>
+        <button id="install-app" type="button" class="rounded-lg border border-emerald-700 px-3 py-2 text-sm font-medium text-emerald-800">Instalar app</button>
         <button id="logout" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Salir</button>
       </div>
     </div>
@@ -35,6 +39,7 @@
       </label>
     </div>
     <div id="notice" role="status" class="mb-5 hidden rounded-xl px-4 py-3 text-sm"></div>
+    <p id="install-help" class="mt-3 hidden text-xs leading-5 text-slate-500" role="status" aria-live="polite"></p>
     <section id="metrics" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
       <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Saldo inicial del día</p><p id="opening-cash" class="mt-2 text-2xl font-semibold">—</p></article>
       <article class="rounded-2xl bg-white p-5 shadow-sm"><p class="text-sm text-slate-500">Saldo final de caja</p><p id="closing-cash" class="mt-2 text-2xl font-semibold">—</p></article>

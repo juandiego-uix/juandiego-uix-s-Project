@@ -96,6 +96,10 @@ gunicorn app:app
 
 Tailwind CSS 3.4.17 se compila a `static/app.css`; jsPDF 2.5.2 y jsPDF-AutoTable 3.8.4 se sirven desde `static/vendor/`. La interfaz y la exportación de PDF no dependen de CDNs, y la política CSP solo permite recursos del mismo origen.
 
+## Instalar en el celular
+
+Abre el dominio HTTPS de producción en el navegador del teléfono y usa **Instalar app**. En Android también se puede elegir **Instalar app** o **Añadir a pantalla principal** en el menú de Chrome. En iPhone o iPad, abre el sitio en Safari, toca **Compartir** y selecciona **Añadir a pantalla de inicio**. El icono abre ARANKO FOOD en una ventana independiente sin pasar por una tienda de aplicaciones. Se necesita conexión a Internet para iniciar sesión y consultar o guardar datos; solo los recursos estáticos se guardan para uso sin conexión.
+
 Para regenerar el CSS en Windows, descarga el ejecutable standalone oficial de Tailwind CSS 3.4.17 en la raíz del proyecto y ejecútalo desde PowerShell:
 
 ```powershell
