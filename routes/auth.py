@@ -17,8 +17,8 @@ def login():
         authenticate(email, password)
     except PermissionError as error:
         return render_template("login.html", error=str(error)), 403
-    except Exception:
-        current_app.logger.warning("Login failed for submitted email")
+    except Exception as error:
+        current_app.logger.exception("Supabase login failed (%s)", type(error).__name__)
         return render_template("login.html", error="Credenciales incorrectas o servicio no disponible."), 401
     return redirect(url_for("index"))
 

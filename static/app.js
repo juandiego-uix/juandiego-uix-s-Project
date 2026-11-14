@@ -3,14 +3,14 @@
   const csrf = document.querySelector('meta[name="csrf-token"]')?.content || "";
   const dateInput = document.getElementById("report-date");
   if (!dateInput) return;
+  const businessTimezone = dateInput.dataset.timezone || "UTC";
   const state = { data: null, invoiceItems: [] };
-  const now = new Date();
-  dateInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  if (!dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
   const $ = (id) => document.getElementById(id);
   const safe = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[char]));
-  const money = (value) => new Intl.NumberFormat("es", {
+  const money = (value) => new Intl.NumberFormat("es-CO", {
     style: "currency", currency: state.data?.currency || "USD",
     minimumFractionDigits: 2, maximumFractionDigits: 2
   }).format(Number(value || 0));
@@ -60,7 +60,11 @@
     ).join("") : emptyRow(3, "No hay deudas activas.");
     $("cash-table").innerHTML = d.cash_movements.length ? d.cash_movements.map((row) => {
       const amount = `${row.direction === "in" ? "+" : "−"}${money(row.amount)}`;
-      const time = new Date(row.created_at).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" });
+      const time = new Date(row.created_at).toLocaleTimeString("es-CO", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: businessTimezone
+      });
       return `<tr class="border-t border-slate-100"><td class="px-5 py-3">${time}</td><td class="px-3 py-3">${row.direction === "in" ? "Entrada" : "Salida"}</td><td class="px-3 py-3">${safe(row.description)}</td><td class="px-5 py-3 font-medium">${amount}</td></tr>`;
     }).join("") : emptyRow(4, "Sin movimientos registrados.");
     $("invoice-client").innerHTML = `<option value="">Venta sin cliente</option>` + d.clients.map((c) => `<option value="${safe(c.id)}">${safe(c.name)}</option>`).join("");

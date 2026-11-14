@@ -29,7 +29,8 @@ def _amount(data, key, label, allow_zero=False):
         or (not allow_zero and value == 0)
         or value.as_tuple().exponent < -2
     ):
-        raise ValidationError(f"{label} debe ser mayor que cero y tener máximo 2 decimales.")
+        minimum = "igual o mayor que cero" if allow_zero else "mayor que cero"
+        raise ValidationError(f"{label} debe ser {minimum} y tener máximo 2 decimales.")
     return str(value.quantize(Decimal("0.01")))
 
 
@@ -39,7 +40,10 @@ def _optional_text(data, key, max_length):
         return None
     if not isinstance(value, str):
         raise ValidationError(f"El campo {key} no es válido.")
-    return value.strip()[:max_length] or None
+    value = value.strip()
+    if len(value) > max_length:
+        raise ValidationError(f"El campo {key} no puede superar {max_length} caracteres.")
+    return value or None
 
 
 def _uuid(value, label, optional=False):

@@ -6,3 +6,4 @@ __pycache__/
 .pytest_cache/
 .vercel/
 node_modules/
+tailwindcss-windows-x64.exe

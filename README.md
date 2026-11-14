@@ -94,7 +94,17 @@ Abre `http://127.0.0.1:5000`. En un servidor Linux, para servir producción fuer
 gunicorn app:app
 ```
 
-Tailwind CSS (3.4.17) y jsPDF se cargan desde CDN; el dispositivo necesita conexión para abrir el panel y generar PDF. El Play CDN de Tailwind facilita el arranque, pero no es el modo recomendado por Tailwind para cargas de producción de alto volumen: en ese caso compila Tailwind a un CSS estático local, sirve jsPDF localmente y ajusta la política CSP en `app.py`.
+Tailwind CSS 3.4.17 se compila a `static/app.css`; jsPDF 2.5.2 y jsPDF-AutoTable 3.8.4 se sirven desde `static/vendor/`. La interfaz y la exportación de PDF no dependen de CDNs, y la política CSP solo permite recursos del mismo origen.
+
+Para regenerar el CSS en Windows, descarga el ejecutable standalone oficial de Tailwind CSS 3.4.17 en la raíz del proyecto y ejecútalo desde PowerShell:
+
+```powershell
+curl.exe -fL "https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-windows-x64.exe" -o .\tailwindcss-windows-x64.exe
+.\tailwindcss-windows-x64.exe -i .\styles\tailwind.css -o .\static\app.css --minify
+Remove-Item .\tailwindcss-windows-x64.exe
+```
+
+El ejecutable no se incluye en el repositorio. Descárgalo desde la publicación oficial de Tailwind CSS y vuelve a desplegar después de actualizar el CSS. Los avisos de licencia de las librerías PDF están en `static/vendor/`.
 
 ## 4. Desplegar en Vercel
 

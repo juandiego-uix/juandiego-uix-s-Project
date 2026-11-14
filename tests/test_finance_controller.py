@@ -7,6 +7,9 @@ class ModelStub:
     def create_invoice(self, values):
         return values
 
+    def create_client(self, values):
+        return values
+
 
 class FinanceControllerTests(unittest.TestCase):
     def setUp(self):
@@ -45,6 +48,13 @@ class FinanceControllerTests(unittest.TestCase):
             self.controller.add_invoice({
                 "items": [{"product_id": "not-a-uuid", "quantity": 1}],
                 "initial_payment": "0",
+            })
+
+    def test_client_rejects_optional_text_over_limit(self):
+        with self.assertRaises(ValidationError):
+            self.controller.add_client({
+                "name": "Cliente",
+                "phone": "1" * 41,
             })
 
 

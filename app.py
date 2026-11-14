@@ -1,6 +1,7 @@
 import secrets
-from datetime import timedelta
+from datetime import datetime, timedelta
 from re import fullmatch
+from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from cryptography.fernet import Fernet
@@ -28,8 +29,21 @@ def create_app():
         raise RuntimeError(f"Faltan variables de entorno requeridas: {', '.join(missing)}")
     if len(app.config["SECRET_KEY"]) < 32:
         raise RuntimeError("SECRET_KEY debe tener al menos 32 caracteres.")
-    if not app.config["SUPABASE_URL"].startswith("https://"):
-        raise RuntimeError("SUPABASE_URL debe usar HTTPS.")
+    supabase_url = app.config["SUPABASE_URL"].strip()
+    parsed_supabase_url = urlsplit(supabase_url)
+    if (
+        parsed_supabase_url.scheme != "https"
+        or not parsed_supabase_url.hostname
+        or parsed_supabase_url.username
+        or parsed_supabase_url.password
+        or parsed_supabase_url.path not in ("", "/")
+        or parsed_supabase_url.query
+        or parsed_supabase_url.fragment
+    ):
+        raise RuntimeError(
+            "SUPABASE_URL debe ser la URL base HTTPS del proyecto, sin /rest/v1 ni otros parámetros."
+        )
+    app.config["SUPABASE_URL"] = supabase_url.rstrip("/")
     if not fullmatch(r"[A-Z]{3}", app.config["CURRENCY_CODE"]):
         raise RuntimeError("CURRENCY_CODE debe ser un código ISO 4217 de tres letras.")
     try:
@@ -56,8 +70,9 @@ def create_app():
             return render_template("login.html")
         return render_template(
             "dashboard.html",
-            currency=app.config["CURRENCY_CODE"],
             csrf_token=session.get("csrf_token", ""),
+            initial_date=datetime.now(ZoneInfo(app.config["BUSINESS_TIMEZONE"])).date().isoformat(),
+            business_timezone=app.config["BUSINESS_TIMEZONE"],
         )
 
     @app.errorhandler(ValidationError)
@@ -89,10 +104,10 @@ def create_app():
         else:
             response.headers["Cache-Control"] = "no-store"
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdn.tailwindcss.com; "
-            "style-src 'self' 'unsafe-inline'; "
-            "font-src 'self' data:; img-src 'self' data:; "
-            "connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+            "default-src 'self'; script-src 'self'; style-src 'self'; "
+            "font-src 'self'; img-src 'self' data:; connect-src 'self'; "
+            "object-src 'none'; base-uri 'self'; form-action 'self'; "
+            "frame-ancestors 'none'; manifest-src 'self'; worker-src 'self'"
         )
         if request.is_secure or app.config["SESSION_COOKIE_SECURE"]:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"

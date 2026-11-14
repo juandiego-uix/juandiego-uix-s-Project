@@ -9,9 +9,9 @@
   <title>Panel financiero | ARANKO FOOD</title>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="icon" href="{{ url_for('static', filename='icons/aranko.svg') }}" type="image/svg+xml">
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script src="{{ url_for('static', filename='vendor/jspdf.umd.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/jspdf.plugin.autotable.min.js') }}" defer></script>
 </head>
 <body class="min-h-screen bg-[#f3f5f2] text-slate-900">
   <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -31,7 +31,7 @@
     <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
       <div><p class="text-sm font-semibold text-emerald-800">RESUMEN DEL NEGOCIO</p><h1 class="mt-1 text-2xl font-semibold">Panel de control</h1><p class="mt-1 text-sm text-slate-500">Caja, ventas y obligaciones de ARANKO FOOD.</p></div>
       <label class="text-sm font-medium text-slate-600">Fecha de consulta
-        <input id="report-date" type="date" class="ml-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900">
+        <input id="report-date" type="date" data-timezone="{{ business_timezone }}" value="{{ initial_date }}" class="ml-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900">
       </label>
     </div>
     <div id="notice" role="status" class="mb-5 hidden rounded-xl px-4 py-3 text-sm"></div>
@@ -106,7 +106,7 @@
       <label class="mt-4 block text-sm font-medium">Notas
         <input id="invoice-notes" maxlength="500" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
       </label>
-      <div class="mt-5 flex items-center justify-between"><strong>Total: <span id="invoice-total">0.00</span> {{ currency }}</strong><button class="rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar factura</button></div>
+      <div class="mt-5 flex items-center justify-between"><strong>Total: <span id="invoice-total">0</span></strong><button class="rounded-lg bg-[#176b50] px-4 py-2.5 font-semibold text-white">Guardar factura</button></div>
     </form>
   </div>
 

@@ -7,3 +7,6 @@ __pycache__
 .gitignore
 .vercelignore
 tests
+styles
+tailwind.config.js
+tailwindcss-windows-x64.exe

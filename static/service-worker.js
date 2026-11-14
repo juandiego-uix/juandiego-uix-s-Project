@@ -1,6 +1,13 @@
 "use strict";
-const CACHE = "aranko-shell-v1";
-const SHELL = ["/static/icons/aranko.svg", "/static/manifest.json", "/static/app.js"];
+const CACHE = "aranko-shell-v2";
+const SHELL = [
+  "/static/icons/aranko.svg",
+  "/static/manifest.json",
+  "/static/app.css",
+  "/static/app.js",
+  "/static/vendor/jspdf.umd.min.js",
+  "/static/vendor/jspdf.plugin.autotable.min.js"
+];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });
@@ -11,6 +18,6 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== "GET" || url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
   if (url.pathname.startsWith("/static/")) {
-    event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
   }
 });
